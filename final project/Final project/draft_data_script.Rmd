@@ -1,8 +1,170 @@
 ---
 title: "Final project"
+author: Mandi, Marielena, Amy
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+theme_set(theme_minimal())
+
+library(tidyverse)
+library(here)
+library(rio)
+library(janitor)
 ```
+
+### Load in data
+
+```{r}
+act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_df") %>% 
+  characterize() %>% 
+  clean_names()
+
+
+act_t1_12520 <- import(here("data", "ACT Suicide Prevention T1 1-25-20.sav"), setclass = "tbl_df") %>% 
+  characterize() %>% 
+  clean_names()
+```
+
+### Conduct a full join to explore the differences in the two files shared with us. Both datasets had the same number of rows (one row per participant), but one dataset had 137 columns and the other had 161 columns. We suspected the file with more columns contained additional variables. The joined file had no change in number of rows and 161 columns.
+
+```{r}
+dim(act_t1)
+dim(act_t1_12520)
+
+act_all <- full_join(act_t1, act_t1_12520)
+
+dim(act_all)
+```
+
+### Calculate mean, SD, N, min, and max of Beck Depression Inventory (BDI) scores by all reported genders.
+
+```{r}
+act_all %>% 
+  group_by(dem1_07a) %>% 
+  summarize(mean_bdi = mean(bdi1, na.rm = TRUE),
+            sd_bdi = sd(bdi1, na.rm = TRUE),
+            n_bdi = n(), 
+            min_bdi = min(bdi1, na.rm = TRUE), 
+            max_bdi = max(bdi1, na.rm = TRUE))
+```
+
+### We are interested in examining the relationship between income and depression (as measured with the BDI) for participants who identify as female. Filter dataset to only include female participants accordingly.
+
+```{r}
+act_all_female <- act_all %>% 
+  filter(dem1_07a == "Woman")
+```
+
+### Explore the distribution of participants' ages. The majority of female participants are 18 years old. 
+
+```{r}
+act_all_female %>% 
+  ggplot(aes(dem1_01)) +
+  geom_bar(fill = "magenta") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Distributions of BDI scores by age group. Distribution of BDI scores for 18-year-old female participants is positively skewed.
+
+```{r}
+act_all_female %>% 
+  ggplot(aes(bdi1)) +
+  geom_bar(fill = "magenta") + 
+  facet_wrap(~dem1_01)
+```
+
+### Descriptive statistics of female participants' BDI scores by age
+
+```{r}
+act_all_female %>% 
+  group_by(dem1_01) %>% 
+  summarize(mean_bdi = mean(bdi1, na.rm = TRUE),
+            sd_bdi = sd(bdi1, na.rm = TRUE),
+            n_bdi = n(), 
+            min_bdi = min(bdi1, na.rm = TRUE), 
+            max_bdi = max(bdi1, na.rm = TRUE))
+```
+
+### Side-by-side boxplots of BDI scores by age for all female participants 
+```{r}
+ggplot(act_all_female, aes(bdi1, dem1_01)) +
+  geom_boxplot() + 
+  coord_flip() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Bar chart of personal gross annual income for all female participants 
+
+```{r}
+act_all_female %>% 
+  mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
+                                              "$5,000 - $9,999",
+                                              "$10,000 - $14,999",
+                                              "$15,000 - $19,999",
+                                              "$20,000 - $24,999",
+                                              "$25,000 - $29,999",
+                                              "$50,000 or more",
+                                              "I choose not to answer",
+                                              "Unknown"
+                                              ))) %>% 
+  ggplot(aes(dem1_14)) +
+  geom_bar(fill = "darkgreen") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Side-by-side boxplots of BDI scores by personal gross annual income for female 18-year-old participants who were currently working
+
+```{r}
+act_all_female %>% 
+  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% 
+  mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
+                                              "$5,000 - $9,999",
+                                              "$10,000 - $14,999",
+                                              "$15,000 - $19,999",
+                                              "$20,000 - $24,999",
+                                              "$25,000 - $29,999",
+                                              "$50,000 or more",
+                                              "I choose not to answer",
+                                              "Unknown"
+                                              ))) %>% 
+  ggplot(aes(bdi1, dem1_14)) +
+  geom_boxplot() + 
+  coord_flip() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+### Descriptive statistics (M, SD, N) of BDI scores for 18-year-old female participants who work by income bracket (group_by, summarize)
+
+```{r}
+act_all_female %>% 
+  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% 
+  mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
+                                              "$5,000 - $9,999",
+                                              "$10,000 - $14,999",
+                                              "$15,000 - $19,999",
+                                              "$20,000 - $24,999",
+                                              "$25,000 - $29,999",
+                                              "$50,000 or more",
+                                              "I choose not to answer",
+                                              "Unknown"
+                                              ))) %>% 
+  group_by(dem1_14) %>% 
+  summarize(mean_bdi = mean(bdi1, na.rm = TRUE),
+            sd_bdi = sd(bdi1, na.rm = TRUE),
+            n_bdi = n(), 
+            min_bdi = min(bdi1, na.rm = TRUE), 
+            max_bdi = max(bdi1, na.rm = TRUE))
+```
+
+
+### Playing around with one of the table functions covered in Week 6 (gtsummary). You'll need to download the gtsummary package for this to work if you haven't. The resulting table shows the counts and percentages of responses for each variable for female participants (e.g., number and percentage of female participants who reported their age as 17).
+```{r}
+install.packages("gtsummary")
+
+act_all_female %>%
+  gtsummary::tbl_summary()
+```
+
