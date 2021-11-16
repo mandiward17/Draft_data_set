@@ -12,6 +12,7 @@ library(tidyverse)
 library(here)
 library(rio)
 library(janitor)
+library(summary)
 ```
 
 ### Load in data
@@ -63,7 +64,9 @@ act_all_female <- act_all %>%
 act_all_female %>% 
   ggplot(aes(dem1_01)) +
   geom_bar(fill = "magenta") + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Number of Female Participants by Age", y = "Number of Particpiants", x = "Age of Participants")
+
 ```
 
 ### Distributions of BDI scores by age group. Distribution of BDI scores for 18-year-old female participants is positively skewed.
@@ -72,7 +75,8 @@ act_all_female %>%
 act_all_female %>% 
   ggplot(aes(bdi1)) +
   geom_bar(fill = "magenta") + 
-  facet_wrap(~dem1_01)
+  facet_wrap(~dem1_01) +
+  labs(title = "Rates of Depression among Female Participants by Age", subtitle = "Using results from the Beck Depression Inventory", y = "Number of Participants", x = "Rate of Depression")
 ```
 
 ### Descriptive statistics of female participants' BDI scores by age
@@ -92,7 +96,8 @@ act_all_female %>%
 ggplot(act_all_female, aes(bdi1, dem1_01)) +
   geom_boxplot() + 
   coord_flip() + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Rate of Depression among Female Participants by Age", subtitle = "Using responses to the Beck Depression Inventory", x = "Beck Depression Inventory Score", y = "Participant Age" )
 ```
 
 ### Bar chart of personal gross annual income for all female participants 
@@ -111,7 +116,8 @@ act_all_female %>%
                                               ))) %>% 
   ggplot(aes(dem1_14)) +
   geom_bar(fill = "darkgreen") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Female Participants by Annual Income", y = "Number of Participants", x = "Annual Income")
 ```
 
 ### Side-by-side boxplots of BDI scores by personal gross annual income for female 18-year-old participants who were currently working
@@ -132,7 +138,8 @@ act_all_female %>%
   ggplot(aes(bdi1, dem1_14)) +
   geom_boxplot() + 
   coord_flip() + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Rate of Depression in Female Participants by Annual Income", x = "Beck Depression Inventory Scores", y = "Annual Income")
 
 ```
 
