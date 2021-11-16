@@ -6,16 +6,17 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-theme_set(theme_minimal())
 
 library(tidyverse)
 library(here)
 library(rio)
 library(janitor)
-library(summary)
+library(gtsummary)
+
+theme_set(theme_minimal())
 ```
 
-### Load in data
+#### Load in data
 
 ```{r}
 act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_df") %>% 
@@ -28,18 +29,21 @@ act_t1_12520 <- import(here("data", "ACT Suicide Prevention T1 1-25-20.sav"), se
   clean_names()
 ```
 
-### Conduct a full join to explore the differences in the two files shared with us. Both datasets had the same number of rows (one row per participant), but one dataset had 137 columns and the other had 161 columns. We suspected the file with more columns contained additional variables. The joined file had no change in number of rows and 161 columns.
+#### Conduct a full join to explore the differences in the two files shared with us. Both datasets had the same number of rows (one row per participant as confirmed using the `length()` and `unique()` functions), but one dataset had 137 columns and the other had 161 columns. We suspected the file with more columns contained additional variables. The joined file had no change in number of rows and 161 columns.
 
 ```{r}
 dim(act_t1)
 dim(act_t1_12520)
+length(unique(act_t1$id))
+length(unique(act_t1_12520$id))
 
 act_all <- full_join(act_t1, act_t1_12520)
 
 dim(act_all)
+length(unique(act_all$id))
 ```
 
-### Calculate mean, SD, N, min, and max of Beck Depression Inventory (BDI) scores by all reported genders.
+#### Calculate *M*, *SD*, *n*, min, and max of Beck Depression Inventory (BDI) scores by all reported genders.
 
 ```{r}
 act_all %>% 
@@ -51,14 +55,14 @@ act_all %>%
             max_bdi = max(bdi1, na.rm = TRUE))
 ```
 
-### We are interested in examining the relationship between income and depression (as measured with the BDI) for participants who identify as female. Filter dataset to only include female participants accordingly.
+#### We are interested in examining the relationship between income and depression (as measured with the BDI) for participants who identify as female. Filter dataset to only include female participants accordingly.
 
 ```{r}
 act_all_female <- act_all %>% 
   filter(dem1_07a == "Woman")
 ```
 
-### Explore the distribution of participants' ages. The majority of female participants are 18 years old. 
+#### Explore the distribution of participants' ages. The majority of female participants are 18 years old. 
 
 ```{r}
 act_all_female %>% 
@@ -69,7 +73,7 @@ act_all_female %>%
 
 ```
 
-### Distributions of BDI scores by age group. Distribution of BDI scores for 18-year-old female participants is positively skewed.
+#### Distributions of BDI scores by age group. Distribution of BDI scores for 18-year-old female participants is positively skewed.
 
 ```{r}
 act_all_female %>% 
@@ -79,7 +83,7 @@ act_all_female %>%
   labs(title = "Rates of Depression among Female Participants by Age", subtitle = "Using results from the Beck Depression Inventory", y = "Number of Participants", x = "Rate of Depression")
 ```
 
-### Descriptive statistics of female participants' BDI scores by age
+#### Descriptive statistics of female participants' BDI scores by age
 
 ```{r}
 act_all_female %>% 
@@ -91,7 +95,8 @@ act_all_female %>%
             max_bdi = max(bdi1, na.rm = TRUE))
 ```
 
-### Side-by-side boxplots of BDI scores by age for all female participants 
+#### Side-by-side boxplots of BDI scores by age for all female participants 
+
 ```{r}
 ggplot(act_all_female, aes(bdi1, dem1_01)) +
   geom_boxplot() + 
@@ -100,7 +105,7 @@ ggplot(act_all_female, aes(bdi1, dem1_01)) +
   labs(title = "Rate of Depression among Female Participants by Age", subtitle = "Using responses to the Beck Depression Inventory", x = "Beck Depression Inventory Score", y = "Participant Age" )
 ```
 
-### Bar chart of personal gross annual income for all female participants 
+#### Bar chart of personal gross annual income for all female participants 
 
 ```{r}
 act_all_female %>% 
@@ -120,7 +125,7 @@ act_all_female %>%
   labs(title = "Female Participants by Annual Income", y = "Number of Participants", x = "Annual Income")
 ```
 
-### Side-by-side boxplots of BDI scores by personal gross annual income for female 18-year-old participants who were currently working
+#### Side-by-side boxplots of BDI scores by personal gross annual income for female 18-year-old participants who were currently working
 
 ```{r}
 act_all_female %>% 
@@ -143,7 +148,7 @@ act_all_female %>%
 
 ```
 
-### Descriptive statistics (M, SD, N) of BDI scores for 18-year-old female participants who work by income bracket (group_by, summarize)
+#### Descriptive statistics (*M*, *SD*, *n*) of BDI scores for 18-year-old female participants who work by income bracket (group_by, summarize)
 
 ```{r}
 act_all_female %>% 
@@ -166,11 +171,9 @@ act_all_female %>%
             max_bdi = max(bdi1, na.rm = TRUE))
 ```
 
+#### Trying out one of the table functions covered in Week 6 (gtsummary). The resulting table shows the counts and percentages of responses for each variable for female participants (e.g., number and percentage of female participants who reported their age as 17).
 
-### Playing around with one of the table functions covered in Week 6 (gtsummary). You'll need to download the gtsummary package for this to work if you haven't. The resulting table shows the counts and percentages of responses for each variable for female participants (e.g., number and percentage of female participants who reported their age as 17).
 ```{r}
-install.packages("gtsummary")
-
 act_all_female %>%
   gtsummary::tbl_summary()
 ```
