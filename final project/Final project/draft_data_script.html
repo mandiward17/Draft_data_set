@@ -170,6 +170,23 @@ pre code {
 </div>
 
 
+<div id="description-of-the-dataset-and-research-questions" class="section level3">
+<h3>Description of the dataset and research questions</h3>
+<p>We will be using data from a study conducted in 2020 called ACT Suicide Prevention. This study collected dozens of variables of data, including responses to various assessments, such as the Beck Depression Inventory, from participants to determine if the ACT intervention for suicidality in college students was effective. Among the many variables gathered were participants’ age, living situation, race/ethnicity, gender, household income, and financial support. We are interested in looking at the relationship between college-aged female-identifying participants, household income, and levels of depression. Utilizing these four variables, gender, age, income, and severity of depression, we will be able to develop several visual graphs to help interpret the data and the relationships between variables, if any. Depending on our preliminary findings, we may decide to reduce or expand the variables we include in our project, as there are several available in the dataset.. Although there are no personal identifiers in the dataset, it is very personal information that has been gathered from participants. So we may need to “scramble” data for analysis and our final presentation. Our research question for this project will be “Is there a relationship between income rates in college-aged women and depression?” Variables of interest:</p>
+<ul>
+<li>Age (dem 1.01)</li>
+<li>Gender (dem1.07a - demo1.07b)</li>
+<li>Income:
+<ul>
+<li>Household income (dem1.13)</li>
+<li>Income/job situation (dem1.14 - dem1.15b)</li>
+<li>Financial support (dem1.16a - dem1.16g)</li>
+</ul></li>
+<li>Beck Depression Inventory (bdi1)</li>
+</ul>
+</div>
+<div id="draft-data-script" class="section level3">
+<h3>Draft Data Script</h3>
 <div id="load-in-data" class="section level4">
 <h4>Load in data</h4>
 <pre class="r"><code>act_t1 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1.sav&quot;), setclass = &quot;tbl_df&quot;) %&gt;% 
@@ -213,6 +230,157 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
 ## 1 Man             6.86   7.16   369       0      53
 ## 2 Transgender    21     NA        1      21      21
 ## 3 Woman           8.16   6.86   602       0      36</code></pre>
+</div>
+<div id="calculate-m-sd-and-n-of-beck-depression-inventory-bdi-scores-by-all-reported-genders-and-income-level.-this-resulted-in-a-table-with-columns-for-gender-income-category-and-descriptive-stats-for-each-group-rows-corresponded-to-stats-for-a-gender-group-and-income-group.-we-used-pivot_wider-to-widen-the-table-by-the-gender-variable.-this-resulted-in-m-sd-and-n-columns-for-each-gender.-however-the-resulting-columns-were-not-grouped-by-gender-but-by-descriptive-stat-e.g.-mean_bdi_manmean_bdi_transgender-mean_bdi_woman.-we-wanted-the-descriptives-m-sd-and-n-grouped-by-gender-e.g.-m-sd-n-for-men-etc..-to-accomplish-this-we-used-pivot_wider_spec-to-summarize-bdi-descriptive-stats-for-each-income-category-by-reported-gender.-in-other-words-the-resulting-table-has-sets-of-columns-of-descriptives-for-each-reported-gender-and-one-row-per-income-category.-we-then-used-pivot_longer-to-transform-the-table-to-a-long-form." class="section level4">
+<h4>Calculate <em>M</em>, <em>SD</em>, and <em>n</em> of Beck Depression Inventory (BDI) scores by all reported genders and income level. This resulted in a table with columns for gender, income category, and descriptive stats for each group (rows corresponded to stats for a gender group and income group). We used <code>pivot_wider()</code> to widen the table by the gender variable. This resulted in <em>M</em>, <em>SD</em>, and <em>n</em> columns for each gender. However, the resulting columns were not grouped by gender but by descriptive stat (e.g., mean_bdi_Man,mean_bdi_Transgender, mean_bdi_Woman). We wanted the descriptives (<em>M</em>, <em>SD</em>, and <em>n</em>) grouped by gender (e.g., <em>M</em>, <em>SD</em>, <em>n</em> for men, etc.). To accomplish this, we used <code>pivot_wider_spec()</code> to summarize BDI descriptive stats for each income category by reported gender. In other words, the resulting table has sets of columns of descriptives for each reported gender and one row per income category. We then used <code>pivot_longer()</code> to transform the table to a long form.</h4>
+<pre class="r"><code>act_all_descrip_gender_income &lt;- act_all %&gt;% 
+  mutate(dem1_14 = factor(dem1_14, levels = c(&quot;Less than $5,000&quot;,
+                                              &quot;$5,000 - $9,999&quot;,
+                                              &quot;$10,000 - $14,999&quot;,
+                                              &quot;$15,000 - $19,999&quot;,
+                                              &quot;$20,000 - $24,999&quot;,
+                                              &quot;$25,000 - $29,999&quot;,
+                                              &quot;$50,000 or more&quot;,
+                                              &quot;I choose not to answer&quot;,
+                                              &quot;Unknown&quot;
+                                              )) )%&gt;% 
+  group_by(dem1_07a, dem1_14) %&gt;% 
+  summarize(mean_bdi = mean(bdi1, na.rm = TRUE),
+            sd_bdi = sd(bdi1, na.rm = TRUE),
+            n_bdi = n())</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;dem1_07a&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>act_all_descrip_gender_income</code></pre>
+<pre><code>## # A tibble: 18 × 5
+## # Groups:   dem1_07a [3]
+##    dem1_07a    dem1_14                mean_bdi sd_bdi n_bdi
+##    &lt;chr&gt;       &lt;fct&gt;                     &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt;
+##  1 Man         Less than $5,000           6.72  6.53    235
+##  2 Man         $5,000 - $9,999            6.95  7.92     55
+##  3 Man         $10,000 - $14,999          6.71  7.24     14
+##  4 Man         $15,000 - $19,999          8    NA         1
+##  5 Man         $50,000 or more           15.3  19.6       3
+##  6 Man         I choose not to answer    10.5   4.51      4
+##  7 Man         Unknown                    6.64  8.20     56
+##  8 Man         &lt;NA&gt;                       8    NA         1
+##  9 Transgender Less than $5,000          21    NA         1
+## 10 Woman       Less than $5,000           8.04  6.85    360
+## 11 Woman       $5,000 - $9,999            8.38  6.64     66
+## 12 Woman       $10,000 - $14,999          9.62  8.89     21
+## 13 Woman       $15,000 - $19,999         11.5   0.707     2
+## 14 Woman       $20,000 - $24,999          5    NA         1
+## 15 Woman       $25,000 - $29,999          4    NA         1
+## 16 Woman       $50,000 or more           10.5  11.7       4
+## 17 Woman       I choose not to answer     9.22  9.16      9
+## 18 Woman       Unknown                    8.03  6.49    138</code></pre>
+<pre class="r"><code>act_all_descrip_gender_income_wide &lt;- act_all_descrip_gender_income %&gt;%
+  pivot_wider(
+    names_from = dem1_07a,
+    values_from = c(mean_bdi, sd_bdi, n_bdi)
+    ) %&gt;% 
+  arrange(dem1_14)
+
+act_all_descrip_gender_income_wide</code></pre>
+<pre><code>## # A tibble: 10 × 10
+##    dem1_14                mean_bdi_Man mean_bdi_Transg… mean_bdi_Woman sd_bdi_Man
+##    &lt;fct&gt;                         &lt;dbl&gt;            &lt;dbl&gt;          &lt;dbl&gt;      &lt;dbl&gt;
+##  1 Less than $5,000               6.72               21           8.04       6.53
+##  2 $5,000 - $9,999                6.95               NA           8.38       7.92
+##  3 $10,000 - $14,999              6.71               NA           9.62       7.24
+##  4 $15,000 - $19,999              8                  NA          11.5       NA   
+##  5 $20,000 - $24,999             NA                  NA           5         NA   
+##  6 $25,000 - $29,999             NA                  NA           4         NA   
+##  7 $50,000 or more               15.3                NA          10.5       19.6 
+##  8 I choose not to answer        10.5                NA           9.22       4.51
+##  9 Unknown                        6.64               NA           8.03       8.20
+## 10 &lt;NA&gt;                           8                  NA          NA         NA   
+## # … with 5 more variables: sd_bdi_Transgender &lt;dbl&gt;, sd_bdi_Woman &lt;dbl&gt;,
+## #   n_bdi_Man &lt;int&gt;, n_bdi_Transgender &lt;int&gt;, n_bdi_Woman &lt;int&gt;</code></pre>
+<pre class="r"><code>spec &lt;- tibble(
+  .name = c(&quot;mean_bdi_Man&quot;, 
+            &quot;sd_bdi_Man&quot;, 
+            &quot;n_bdi_Man&quot;, 
+            &quot;mean_bdi_Transgender&quot;, 
+            &quot;sd_bdi_Transgender&quot;, 
+            &quot;n_bdi_Transgender&quot;, 
+            &quot;mean_bdi_Woman&quot;, 
+            &quot;sd_bdi_Woman&quot;, 
+            &quot;n_bdi_Woman&quot;),
+  .value = c(&quot;mean_bdi&quot;, 
+             &quot;sd_bdi&quot;, 
+             &quot;n_bdi&quot;, 
+             &quot;mean_bdi&quot;, 
+             &quot;sd_bdi&quot;, 
+             &quot;n_bdi&quot;, 
+             &quot;mean_bdi&quot;, 
+             &quot;sd_bdi&quot;, 
+             &quot;n_bdi&quot;),
+  dem1_07a = c(&quot;Man&quot;,  
+               &quot;Man&quot;, 
+               &quot;Man&quot;,
+               &quot;Transgender&quot;, 
+               &quot;Transgender&quot;, 
+               &quot;Transgender&quot;, 
+               &quot;Woman&quot;,
+               &quot;Woman&quot;,
+               &quot;Woman&quot;)
+)
+
+spec</code></pre>
+<pre><code>## # A tibble: 9 × 3
+##   .name                .value   dem1_07a   
+##   &lt;chr&gt;                &lt;chr&gt;    &lt;chr&gt;      
+## 1 mean_bdi_Man         mean_bdi Man        
+## 2 sd_bdi_Man           sd_bdi   Man        
+## 3 n_bdi_Man            n_bdi    Man        
+## 4 mean_bdi_Transgender mean_bdi Transgender
+## 5 sd_bdi_Transgender   sd_bdi   Transgender
+## 6 n_bdi_Transgender    n_bdi    Transgender
+## 7 mean_bdi_Woman       mean_bdi Woman      
+## 8 sd_bdi_Woman         sd_bdi   Woman      
+## 9 n_bdi_Woman          n_bdi    Woman</code></pre>
+<pre class="r"><code>act_all_descrip_gender_income_wide_spec &lt;- act_all_descrip_gender_income %&gt;%
+  pivot_wider_spec(spec) %&gt;% 
+  arrange(dem1_14)
+
+act_all_descrip_gender_income_wide_spec</code></pre>
+<pre><code>## # A tibble: 10 × 10
+##    dem1_14   mean_bdi_Man sd_bdi_Man n_bdi_Man mean_bdi_Transg… sd_bdi_Transgen…
+##    &lt;fct&gt;            &lt;dbl&gt;      &lt;dbl&gt;     &lt;int&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+##  1 Less tha…         6.72       6.53       235               21               NA
+##  2 $5,000 -…         6.95       7.92        55               NA               NA
+##  3 $10,000 …         6.71       7.24        14               NA               NA
+##  4 $15,000 …         8         NA            1               NA               NA
+##  5 $20,000 …        NA         NA           NA               NA               NA
+##  6 $25,000 …        NA         NA           NA               NA               NA
+##  7 $50,000 …        15.3       19.6          3               NA               NA
+##  8 I choose…        10.5        4.51         4               NA               NA
+##  9 Unknown           6.64       8.20        56               NA               NA
+## 10 &lt;NA&gt;              8         NA            1               NA               NA
+## # … with 4 more variables: n_bdi_Transgender &lt;int&gt;, mean_bdi_Woman &lt;dbl&gt;,
+## #   sd_bdi_Woman &lt;dbl&gt;, n_bdi_Woman &lt;int&gt;</code></pre>
+<pre class="r"><code>act_all_descrip_gender_income_long &lt;- act_all_descrip_gender_income_wide_spec  %&gt;%
+  pivot_longer(
+    cols = -dem1_14, 
+    names_to = c(&quot;Descriptive Statistic&quot;, &quot;Measure&quot;, &quot;Reported Gender&quot;),
+    values_to = &quot;Value&quot;,
+    names_sep = &quot;_&quot;,
+  )
+
+act_all_descrip_gender_income_long</code></pre>
+<pre><code>## # A tibble: 90 × 5
+##    dem1_14          `Descriptive Statistic` Measure `Reported Gender`  Value
+##    &lt;fct&gt;            &lt;chr&gt;                   &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;
+##  1 Less than $5,000 mean                    bdi     Man                 6.72
+##  2 Less than $5,000 sd                      bdi     Man                 6.53
+##  3 Less than $5,000 n                       bdi     Man               235   
+##  4 Less than $5,000 mean                    bdi     Transgender        21   
+##  5 Less than $5,000 sd                      bdi     Transgender        NA   
+##  6 Less than $5,000 n                       bdi     Transgender         1   
+##  7 Less than $5,000 mean                    bdi     Woman               8.04
+##  8 Less than $5,000 sd                      bdi     Woman               6.85
+##  9 Less than $5,000 n                       bdi     Woman             360   
+## 10 $5,000 - $9,999  mean                    bdi     Man                 6.95
+## # … with 80 more rows</code></pre>
 </div>
 <div id="we-are-interested-in-examining-the-relationship-between-income-and-depression-as-measured-with-the-bdi-for-participants-who-identify-as-female.-filter-dataset-to-only-include-female-participants-accordingly." class="section level4">
 <h4>We are interested in examining the relationship between income and depression (as measured with the BDI) for participants who identify as female. Filter dataset to only include female participants accordingly.</h4>
@@ -341,12 +509,12 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
 <h4>Trying out one of the table functions covered in Week 6 (gtsummary). The resulting table shows the counts and percentages of responses for each variable for female participants (e.g., number and percentage of female participants who reported their age as 17).</h4>
 <pre class="r"><code>act_all_female %&gt;%
   gtsummary::tbl_summary()</code></pre>
-<div id="jybouxqkmf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="kbyjzuoacp" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#jybouxqkmf .gt_table {
+#kbyjzuoacp .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -371,7 +539,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-left-color: #D3D3D3;
 }
 
-#jybouxqkmf .gt_heading {
+#kbyjzuoacp .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -383,7 +551,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-right-color: #D3D3D3;
 }
 
-#jybouxqkmf .gt_title {
+#kbyjzuoacp .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -393,7 +561,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-bottom-width: 0;
 }
 
-#jybouxqkmf .gt_subtitle {
+#kbyjzuoacp .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -403,13 +571,13 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-top-width: 0;
 }
 
-#jybouxqkmf .gt_bottom_border {
+#kbyjzuoacp .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#jybouxqkmf .gt_col_headings {
+#kbyjzuoacp .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -424,7 +592,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-right-color: #D3D3D3;
 }
 
-#jybouxqkmf .gt_col_heading {
+#kbyjzuoacp .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -444,7 +612,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   overflow-x: hidden;
 }
 
-#jybouxqkmf .gt_column_spanner_outer {
+#kbyjzuoacp .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -456,15 +624,15 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   padding-right: 4px;
 }
 
-#jybouxqkmf .gt_column_spanner_outer:first-child {
+#kbyjzuoacp .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#jybouxqkmf .gt_column_spanner_outer:last-child {
+#kbyjzuoacp .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#jybouxqkmf .gt_column_spanner {
+#kbyjzuoacp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -476,7 +644,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   width: 100%;
 }
 
-#jybouxqkmf .gt_group_heading {
+#kbyjzuoacp .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -498,7 +666,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   vertical-align: middle;
 }
 
-#jybouxqkmf .gt_empty_group_heading {
+#kbyjzuoacp .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -513,15 +681,15 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   vertical-align: middle;
 }
 
-#jybouxqkmf .gt_from_md > :first-child {
+#kbyjzuoacp .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#jybouxqkmf .gt_from_md > :last-child {
+#kbyjzuoacp .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#jybouxqkmf .gt_row {
+#kbyjzuoacp .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -540,7 +708,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   overflow-x: hidden;
 }
 
-#jybouxqkmf .gt_stub {
+#kbyjzuoacp .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -552,7 +720,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   padding-left: 12px;
 }
 
-#jybouxqkmf .gt_summary_row {
+#kbyjzuoacp .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -562,7 +730,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   padding-right: 5px;
 }
 
-#jybouxqkmf .gt_first_summary_row {
+#kbyjzuoacp .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -572,7 +740,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-top-color: #D3D3D3;
 }
 
-#jybouxqkmf .gt_grand_summary_row {
+#kbyjzuoacp .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -582,7 +750,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   padding-right: 5px;
 }
 
-#jybouxqkmf .gt_first_grand_summary_row {
+#kbyjzuoacp .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -592,11 +760,11 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-top-color: #D3D3D3;
 }
 
-#jybouxqkmf .gt_striped {
+#kbyjzuoacp .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#jybouxqkmf .gt_table_body {
+#kbyjzuoacp .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -605,7 +773,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-bottom-color: #D3D3D3;
 }
 
-#jybouxqkmf .gt_footnotes {
+#kbyjzuoacp .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -619,13 +787,13 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-right-color: #D3D3D3;
 }
 
-#jybouxqkmf .gt_footnote {
+#kbyjzuoacp .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#jybouxqkmf .gt_sourcenotes {
+#kbyjzuoacp .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -639,41 +807,41 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
   border-right-color: #D3D3D3;
 }
 
-#jybouxqkmf .gt_sourcenote {
+#kbyjzuoacp .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#jybouxqkmf .gt_left {
+#kbyjzuoacp .gt_left {
   text-align: left;
 }
 
-#jybouxqkmf .gt_center {
+#kbyjzuoacp .gt_center {
   text-align: center;
 }
 
-#jybouxqkmf .gt_right {
+#kbyjzuoacp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#jybouxqkmf .gt_font_normal {
+#kbyjzuoacp .gt_font_normal {
   font-weight: normal;
 }
 
-#jybouxqkmf .gt_font_bold {
+#kbyjzuoacp .gt_font_bold {
   font-weight: bold;
 }
 
-#jybouxqkmf .gt_font_italic {
+#kbyjzuoacp .gt_font_italic {
   font-style: italic;
 }
 
-#jybouxqkmf .gt_super {
+#kbyjzuoacp .gt_super {
   font-size: 65%;
 }
 
-#jybouxqkmf .gt_footnote_marks {
+#kbyjzuoacp .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -3207,6 +3375,7 @@ act_t1_12520 &lt;- import(here(&quot;data&quot;, &quot;ACT Suicide Prevention T1
     </tr>
   </tfoot>
 </table>
+</div>
 </div>
 </div>
 

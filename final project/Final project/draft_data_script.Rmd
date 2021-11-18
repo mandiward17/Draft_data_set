@@ -16,6 +16,22 @@ library(gtsummary)
 theme_set(theme_minimal())
 ```
 
+
+### Description of the dataset and research questions
+
+We will be using data from a study conducted in 2020 called ACT Suicide Prevention. This study collected dozens of variables of data, including responses to various assessments, such as the Beck Depression Inventory, from participants to determine if the ACT intervention for suicidality in college students was effective. Among the many variables gathered were participants’ age, living situation, race/ethnicity, gender, household income, and financial support. We are interested in looking at the relationship between college-aged female-identifying participants, household income, and levels of depression. Utilizing these four variables, gender, age, income, and severity of depression, we will be able to develop several visual graphs to help interpret the data and the relationships between variables, if any. Depending on our preliminary findings, we may decide to reduce or expand the variables we include in our project, as there are several available in the dataset.. Although there are no personal identifiers in the dataset, it is very personal information that has been gathered from participants. So we may need to “scramble” data for analysis and our final presentation. Our research question for this project will be “Is there a relationship between income rates in college-aged women and depression?” 
+Variables of interest:  
+
+- Age (dem 1.01)
+- Gender (dem1.07a - demo1.07b)
+- Income:  
+  + Household income (dem1.13)
+  + Income/job situation (dem1.14 - dem1.15b)
+  + Financial support (dem1.16a - dem1.16g)
+- Beck Depression Inventory (bdi1)
+
+### Draft Data Script  
+
 #### Load in data
 
 ```{r}
@@ -53,6 +69,86 @@ act_all %>%
             n_bdi = n(), 
             min_bdi = min(bdi1, na.rm = TRUE), 
             max_bdi = max(bdi1, na.rm = TRUE))
+```
+
+#### Calculate *M*, *SD*, and *n* of Beck Depression Inventory (BDI) scores by all reported genders and income level. This resulted in a table with columns for gender, income category, and descriptive stats for each group (rows corresponded to stats for a gender group and income group). We used `pivot_wider()` to widen the table by the gender variable. This resulted in  *M*, *SD*, and *n* columns for each gender. However, the resulting columns were not grouped by gender but by descriptive stat (e.g., mean_bdi_Man,mean_bdi_Transgender, mean_bdi_Woman). We wanted the descriptives (*M*, *SD*, and *n*) grouped by gender (e.g., *M*, *SD*, *n* for men, etc.). To accomplish this, we used `pivot_wider_spec()` to summarize BDI descriptive stats for each income category by reported gender. In other words, the resulting table has sets of columns of descriptives for each reported gender and one row per income category. We then used `pivot_longer()` to transform the table to a long form.
+
+```{r}
+act_all_descrip_gender_income <- act_all %>% 
+  mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
+                                              "$5,000 - $9,999",
+                                              "$10,000 - $14,999",
+                                              "$15,000 - $19,999",
+                                              "$20,000 - $24,999",
+                                              "$25,000 - $29,999",
+                                              "$50,000 or more",
+                                              "I choose not to answer",
+                                              "Unknown"
+                                              )) )%>% 
+  group_by(dem1_07a, dem1_14) %>% 
+  summarize(mean_bdi = mean(bdi1, na.rm = TRUE),
+            sd_bdi = sd(bdi1, na.rm = TRUE),
+            n_bdi = n())
+
+act_all_descrip_gender_income
+
+act_all_descrip_gender_income_wide <- act_all_descrip_gender_income %>%
+  pivot_wider(
+    names_from = dem1_07a,
+    values_from = c(mean_bdi, sd_bdi, n_bdi)
+    ) %>% 
+  arrange(dem1_14)
+
+act_all_descrip_gender_income_wide
+
+spec <- tibble(
+  .name = c("mean_bdi_Man", 
+            "sd_bdi_Man", 
+            "n_bdi_Man", 
+            "mean_bdi_Transgender", 
+            "sd_bdi_Transgender", 
+            "n_bdi_Transgender", 
+            "mean_bdi_Woman", 
+            "sd_bdi_Woman", 
+            "n_bdi_Woman"),
+  .value = c("mean_bdi", 
+             "sd_bdi", 
+             "n_bdi", 
+             "mean_bdi", 
+             "sd_bdi", 
+             "n_bdi", 
+             "mean_bdi", 
+             "sd_bdi", 
+             "n_bdi"),
+  dem1_07a = c("Man",  
+               "Man", 
+               "Man",
+               "Transgender", 
+               "Transgender", 
+               "Transgender", 
+               "Woman",
+               "Woman",
+               "Woman")
+)
+
+spec
+
+act_all_descrip_gender_income_wide_spec <- act_all_descrip_gender_income %>%
+  pivot_wider_spec(spec) %>% 
+  arrange(dem1_14)
+
+act_all_descrip_gender_income_wide_spec
+
+act_all_descrip_gender_income_long <- act_all_descrip_gender_income_wide_spec  %>%
+  pivot_longer(
+    cols = -dem1_14, 
+    names_to = c("Descriptive Statistic", "Measure", "Reported Gender"),
+    values_to = "Value",
+    names_sep = "_",
+  )
+
+act_all_descrip_gender_income_long
+
 ```
 
 #### We are interested in examining the relationship between income and depression (as measured with the BDI) for participants who identify as female. Filter dataset to only include female participants accordingly.
