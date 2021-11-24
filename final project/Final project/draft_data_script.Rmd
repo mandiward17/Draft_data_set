@@ -5,7 +5,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE, message = FALSE)
 <<<<<<< Updated upstream
 =======
 <<<<<<< Updated upstream
@@ -94,6 +94,14 @@ length(unique(act_all$id))
 act_all <- full_join(act_t1, act_t1_12520)
 >>>>>>> Stashed changes
 >>>>>>> Stashed changes
+```
+
+### Used select to pull out all columns with demographic infomation as well as BDI scores as these were the only variables we were intersted in looking at. From here we were able to pick which specific variables we wanted to look at relationships between.
+
+```{r select}
+act_all %>% 
+  select(starts_with("dem1"), bdi1
+    )
 ```
 
 #### Calculate *M*, *SD*, *n*, min, and max of Beck Depression Inventory (BDI) scores by all reported genders.
