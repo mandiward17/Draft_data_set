@@ -10,10 +10,6 @@ theme_set(theme_minimal())
 
 library(tidyverse)
 library(here)
-=======
-library(here)
-library(tidyverse)
->>>>>>> Stashed changes
 library(rio)
 library(janitor)
 library(gtsummary)
@@ -37,35 +33,24 @@ Variables of interest:
 ### Draft Data Script  
 
 #### Load in data
-=======
-<<<<<<< Updated upstream
-### Load in data
->>>>>>> Stashed changes
 
 ```{r}
 act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_df") %>% 
   characterize() %>% 
   clean_names()
-
-
-=======
+```
 
 ```{r setup, include=FALSE}
 act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_df") %>% 
   characterize() %>% 
   clean_names()
->>>>>>> Stashed changes
+
 act_t1_12520 <- import(here("data", "ACT Suicide Prevention T1 1-25-20.sav"), setclass = "tbl_df") %>% 
   characterize() %>% 
   clean_names()
 ```
 
-<<<<<<< Updated upstream
 #### Conduct a full join to explore the differences in the two files shared with us. Both datasets had the same number of rows (one row per participant as confirmed using the `length()` and `unique()` functions), but one dataset had 137 columns and the other had 161 columns. We suspected the file with more columns contained additional variables. The joined file had no change in number of rows and 161 columns.
-=======
-<<<<<<< Updated upstream
-### Conduct a full join to explore the differences in the two files shared with us. Both datasets had the same number of rows (one row per participant), but one dataset had 137 columns and the other had 161 columns. We suspected the file with more columns contained additional variables. The joined file had no change in number of rows and 161 columns.
->>>>>>> Stashed changes
 
 ```{r}
 dim(act_t1)
@@ -76,15 +61,8 @@ length(unique(act_t1_12520$id))
 act_all <- full_join(act_t1, act_t1_12520)
 
 dim(act_all)
-<<<<<<< Updated upstream
-length(unique(act_all$id))
-=======
-=======
 
-```{r setup, include=FALSE}
-act_all <- full_join(act_t1, act_t1_12520)
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+length(unique(act_all$id))
 ```
 
 ### Used select to pull out all columns with demographic infomation as well as BDI scores as these were the only variables we were intersted in looking at. From here we were able to pick which specific variables we wanted to look at relationships between.
@@ -96,7 +74,6 @@ act_all %>%
 ```
 
 #### Calculate *M*, *SD*, *n*, min, and max of Beck Depression Inventory (BDI) scores by all reported genders.
-
 ```{r}
 act_all %>% 
   group_by(dem1_07a) %>% 
