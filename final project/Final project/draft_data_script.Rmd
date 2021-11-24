@@ -6,11 +6,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE, message = FALSE)
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
 theme_set(theme_minimal())
->>>>>>> Stashed changes
 
 library(tidyverse)
 library(here)
@@ -24,8 +20,6 @@ library(gtsummary)
 
 theme_set(theme_minimal())
 ```
-
-<<<<<<< Updated upstream
 
 ### Description of the dataset and research questions
 
@@ -42,9 +36,6 @@ Variables of interest:
 
 ### Draft Data Script  
 
-=======
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
 #### Load in data
 =======
 <<<<<<< Updated upstream
