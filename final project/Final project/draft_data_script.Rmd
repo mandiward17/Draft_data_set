@@ -6,7 +6,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE, message = FALSE)
-theme_set(theme_minimal())
 
 library(tidyverse)
 library(here)
@@ -40,7 +39,7 @@ act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_
   clean_names()
 ```
 
-```{r setup, include=FALSE}
+```{r}
 act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_df") %>% 
   characterize() %>% 
   clean_names()
@@ -273,11 +272,12 @@ act_all_female %>%
                                               "Unknown"
                                               ))) %>% 
   group_by(dem1_14) %>% 
-  summarize(mean_bdi = mean(bdi1, na.rm = TRUE),
-            sd_bdi = sd(bdi1, na.rm = TRUE),
-            n_bdi = n(), 
-            min_bdi = min(bdi1, na.rm = TRUE), 
-            max_bdi = max(bdi1, na.rm = TRUE))
+  summarize(n = n(), 
+            M = round(mean(bdi1, na.rm = TRUE), 2),
+            SD = round(sd(bdi1, na.rm = TRUE), 2),
+            Min = min(bdi1, na.rm = TRUE), 
+            Max = max(bdi1, na.rm = TRUE)) %>% 
+  knitr::kable(col.names = c("Annual Income", "n", "M", "SD", "Min", "Max"), caption = "Descriptive Statistics of BDI Scores for 18-Year-Old Female Participants Currently Working")
 ```
 
 #### Trying out one of the table functions covered in Week 6 (gtsummary). The resulting table shows the counts and percentages of responses for each variable for female participants (e.g., number and percentage of female participants who reported their age as 17).
