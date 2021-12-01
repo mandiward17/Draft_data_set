@@ -229,7 +229,7 @@ act_all_female %>%
                                               "Unknown"
                                               ))) %>% 
   ggplot(aes(dem1_14)) +
-  geom_bar(fill = "darkgreen") +
+  geom_bar(fill = "magenta") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(title = "Female Participants by Annual Income", y = "Number of Participants", x = "Annual Income")
 ```
