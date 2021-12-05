@@ -172,7 +172,9 @@ ggplot(act_all_female, aes(bdi1, dem1_01)) +
 
 ## Participants 
 
-Participants in this study were `r act_all_female %>%  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% summarize(n = n())` 18-year-old first-time college freshmen attending the University of Nevada, Reno (UNR). The participants’ data were collected as part of a larger randomized study, the ACT Suicide Prevention Study, that evaluated the effectiveness of an intervention aimed at preventing suicidality among college students (citation). Between 2008 and 2010, all incoming freshmen at UNR between the ages of 18–20 were invited to participate in the ACT Suicide Prevention Study via mass email. Those who expressed interest in participating were screened with the Acceptance and Action Questionnaire-II (@aaq). Students with AAQ-II scores in the upper 50th percentile were selected for inclusion in the study. The dataset we worked from contained pre-intervention baseline data, including participants’ demographic information (e.g., age, race/ethnicity, gender, living situation, working situation, family income, personal income, financial aid) and responses from a wide variety of assessment instruments measuring suicidality, mental health, experiential avoidance, and other theoretically relevant behaviors and views (e.g., values, emotional regulation). There were a total of 972 participants in the pre-intervention baseline dataset from which we sampled, including those who reported their gender as female, male, and transgender. For the purpose of the present research study, a subsample was created that included participants who were 18 years old, reported their gender as female, and were currently working. Self-reported race and ethnicity demographics for the resulting `r act_all_female %>%  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% summarize(n = n())` participants is summarized in Tables 1 and 2.
+Participants in this study were `r act_all_female %>%  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% summarize(n = n())` 18-year-old first-time college freshmen attending the University of Nevada, Reno (UNR). The participants’ data were collected as part of a larger randomized study, the ACT Suicide Prevention Study, that evaluated the effectiveness of an intervention aimed at preventing suicidality among college students (citation). Between 2008 and 2010, all incoming freshmen at UNR between the ages of 18–20 were invited to participate in the ACT Suicide Prevention Study via mass email. Those who expressed interest in participating were screened with the Acceptance and Action Questionnaire-II (@aaq). Students with AAQ-II scores in the upper 50th percentile were selected for inclusion in the study. The dataset we worked from contained pre-intervention baseline data, including participants’ demographic information (e.g., age, race/ethnicity, gender, living situation, working situation, family income, personal income, financial aid) and responses from a wide variety of assessment instruments measuring suicidality, mental health, experiential avoidance, and other theoretically relevant behaviors and views (e.g., values, emotional regulation). There were a total of 972 participants in the pre-intervention baseline dataset from which we sampled, including those who reported their gender as female, male, and transgender.   
+
+For the purpose of the present research study, a subsample was created that included participants who were 18 years old, reported their gender as female, and were currently working. Self-reported race and ethnicity demographics for the resulting `r act_all_female %>%  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% summarize(n = n())` participants is summarized in Tables 1 and 2. Of participants in the present study, 2% reported themselves as American Indian or Alaska Native, 5% as Asian, 2% as Black or African American, 9% as multiracial, 1% as Native Hawaiian or Pacific Islander, and 74% as White or Caucasian. Approximately 7% of participants chose not to respond. Fourteen percent of respondents were Hispanic or Latino, 85% were not Hispanic or Latino, and 1% opted not to respond. 
 
 ```{r convert race ethnicity to factor and assign levels, results = FALSE}
 
@@ -197,7 +199,7 @@ act_all_female %>%
     group_by(dem1_05a) %>% 
     summarize(n = n(), 
             Percent = round(n()/219*100)) %>% 
-    kable(col.names = c("Reported Race", "n", "Percent"), caption = "Racial Demographics Self-Reported by Participants")
+    kable(col.names = c("Race", "n", "Percent"), caption = "Racial Demographics Self-Reported by Participants")
 
 act_all_female %>% 
     filter(dem1_01 == "18" | dem1_15a == "Yes") %>%
@@ -219,7 +221,7 @@ Among other demographic and socioeconomic variables, participants in the ACT Sui
 ## Analyses 
 To evaluate whether severity of depression, as measured with scores from the BDI, varied by level of income, we generated two exploratory data visualizations and calculated a table of descriptive statistics. We first generated a bar graph of the number of participants in each income level. Our second exploratory data visualization was a series of side-by-side boxplots of BDI scores by income level. We also calculated descriptive statistics (*n*, *M*, *SD*, minimum, maximum) for BDI scores by level of reported income. 
  
-To accomplish this project and our analyses, we used @r and the @here, @rio, @janitor, @tidyverse, and @knitr packages. 
+To accomplish this project and our analyses, we used `R` (@r) and the `here()` (@here), `rio()` (@rio), `janitor()` (@janitor), `tidyverse()` (@tidyverse), and `knitr()` (@knitr) packages. 
 
 # Results
 ```{r bar graph income of 18yo female participants currently working}
