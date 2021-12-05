@@ -1,0 +1,292 @@
+---
+title: "Annual Income and Depression Among Women in Their First Year of College: Does Income Impact Depression?"
+subtitle: EDLD 651 Final Project Paper
+author: Marielena McWhirter, Mandi Ward, Amy Warnock 
+output: pdf_document
+bibliography: references.bib 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE)
+
+library(tidyverse)
+library(here)
+library(rio)
+library(janitor)
+library(knitr)
+
+theme_set(theme_minimal())
+```
+
+```{r load data}
+act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_df") %>% 
+  characterize() %>% 
+  clean_names()
+
+act_t1_12520 <- import(here("data", "ACT Suicide Prevention T1 1-25-20.sav"), setclass = "tbl_df") %>% 
+  characterize() %>% 
+  clean_names()
+```
+
+```{r join, results = FALSE}
+dim(act_t1)
+dim(act_t1_12520)
+length(unique(act_t1$id))
+length(unique(act_t1_12520$id))
+
+act_all <- full_join(act_t1, act_t1_12520)
+
+dim(act_all)
+
+length(unique(act_all$id))
+```
+
+```{r select demographic variables and BDI, results = FALSE}
+act_all %>% 
+  select(starts_with("dem1"), bdi1
+    )
+```
+
+```{r exploratory bdi descrip by gender, results = FALSE}
+act_all %>% 
+  group_by(dem1_07a) %>% 
+  summarize(mean_bdi = mean(bdi1, na.rm = TRUE),
+            sd_bdi = sd(bdi1, na.rm = TRUE),
+            n_bdi = n(), 
+            min_bdi = min(bdi1, na.rm = TRUE), 
+            max_bdi = max(bdi1, na.rm = TRUE))
+```
+
+```{r exploratory bdi descrip by gender and income using pivot_wider and pivot_longer, results = FALSE}
+act_all_descrip_gender_income <- act_all %>% 
+  mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
+                                              "$5,000 - $9,999",
+                                              "$10,000 - $14,999",
+                                              "$15,000 - $19,999",
+                                              "$20,000 - $24,999",
+                                              "$25,000 - $29,999",
+                                              "$50,000 or more",
+                                              "I choose not to answer",
+                                              "Unknown"
+                                              )) )%>% 
+  group_by(dem1_07a, dem1_14) %>% 
+  summarize(mean_bdi = mean(bdi1, na.rm = TRUE),
+            sd_bdi = sd(bdi1, na.rm = TRUE),
+            n_bdi = n())
+
+act_all_descrip_gender_income_wide <- act_all_descrip_gender_income %>%
+  pivot_wider(
+    names_from = dem1_07a,
+    values_from = c(mean_bdi, sd_bdi, n_bdi)
+    ) %>% 
+  arrange(dem1_14)
+
+spec <- tibble(
+  .name = c("mean_bdi_Man", 
+            "sd_bdi_Man", 
+            "n_bdi_Man", 
+            "mean_bdi_Transgender", 
+            "sd_bdi_Transgender", 
+            "n_bdi_Transgender", 
+            "mean_bdi_Woman", 
+            "sd_bdi_Woman", 
+            "n_bdi_Woman"),
+  .value = c("mean_bdi", 
+             "sd_bdi", 
+             "n_bdi", 
+             "mean_bdi", 
+             "sd_bdi", 
+             "n_bdi", 
+             "mean_bdi", 
+             "sd_bdi", 
+             "n_bdi"),
+  dem1_07a = c("Man",  
+               "Man", 
+               "Man",
+               "Transgender", 
+               "Transgender", 
+               "Transgender", 
+               "Woman",
+               "Woman",
+               "Woman")
+)
+
+act_all_descrip_gender_income_wide_spec <- act_all_descrip_gender_income %>%
+  pivot_wider_spec(spec) %>% 
+  arrange(dem1_14)
+
+act_all_descrip_gender_income_long <- act_all_descrip_gender_income_wide_spec  %>%
+  pivot_longer(
+    cols = -dem1_14, 
+    names_to = c("Descriptive Statistic", "Measure", "Reported Gender"),
+    values_to = "Value",
+    names_sep = "_",
+  )
+
+```
+
+```{r filter for female only}
+act_all_female <- act_all %>% 
+  filter(dem1_07a == "Woman")
+```
+
+```{r distribution female ages, eval = FALSE}
+act_all_female %>% 
+  ggplot(aes(dem1_01)) +
+  geom_bar(fill = "magenta") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Number of Female Participants by Age", y = "Number of Particpiants", x = "Age of Participants")
+```
+
+```{r distribution BDI scores by all ages, eval = FALSE}
+act_all_female %>% 
+  ggplot(aes(bdi1)) +
+  geom_bar(fill = "magenta") + 
+  facet_wrap(~dem1_01) +
+  labs(title = "Rates of Depression among Female Participants by Age", subtitle = "Using results from the Beck Depression Inventory", y = "Number of Participants", x = "Rate of Depression")
+```
+
+```{r descrip BDI female participants by age, eval = FALSE}
+act_all_female %>% 
+  group_by(dem1_01) %>% 
+  summarize(mean_bdi = mean(bdi1, na.rm = TRUE),
+            sd_bdi = sd(bdi1, na.rm = TRUE),
+            n_bdi = n(), 
+            min_bdi = min(bdi1, na.rm = TRUE), 
+            max_bdi = max(bdi1, na.rm = TRUE))
+```
+
+```{r BDI boxplots female participants by age, eval = FALSE}
+ggplot(act_all_female, aes(bdi1, dem1_01)) +
+  geom_boxplot() + 
+  coord_flip() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Rate of Depression among Female Participants by Age", subtitle = "Using responses to the Beck Depression Inventory", x = "Beck Depression Inventory Score", y = "Participant Age" )
+```
+
+# Abstract
+
+# Introduction
+
+# Method  
+
+## Participants 
+
+Participants in this study were `r act_all_female %>%  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% summarize(n = n())` 18-year-old first-time college freshmen attending the University of Nevada, Reno (UNR). The participants’ data were collected as part of a larger randomized study, the ACT Suicide Prevention Study, that evaluated the effectiveness of an intervention aimed at preventing suicidality among college students (citation). Between 2008 and 2010, all incoming freshmen at UNR between the ages of 18–20 were invited to participate in the ACT Suicide Prevention Study via mass email. Those who expressed interest in participating were screened with the Acceptance and Action Questionnaire-II (@aaq). Students with AAQ-II scores in the upper 50th percentile were selected for inclusion in the study. The dataset we worked from contained pre-intervention baseline data, including participants’ demographic information (e.g., age, race/ethnicity, gender, living situation, working situation, family income, personal income, financial aid) and responses from a wide variety of assessment instruments measuring suicidality, mental health, experiential avoidance, and other theoretically relevant behaviors and views (e.g., values, emotional regulation). There were a total of 972 participants in the pre-intervention baseline dataset from which we sampled, including those who reported their gender as female, male, and transgender. For the purpose of the present research study, a subsample was created that included participants who were 18 years old, reported their gender as female, and were currently working. Self-reported race and ethnicity demographics for the resulting `r act_all_female %>%  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% summarize(n = n())` participants is summarized in Tables 1 and 2.
+
+```{r convert race ethnicity to factor and assign levels, results = FALSE}
+
+act_all_female <- act_all_female %>% 
+  mutate(dem1_04 = factor(dem1_04, levels = c("Hispanic or Latino",
+                                                  "Not Hispanic or Latino",
+                                                  "I choose not to answer"))) %>% 
+  mutate(dem1_05a = factor(dem1_05a, levels = c("American Indian/Alaska Native",
+                                                "Asian",
+                                                "Black or African American",
+                                                "Multiracial",
+                                                "Native Hawaiian or other Pacific Islander",
+                                                "White or Caucasian",
+                                                "I choose not to answer"
+                                                )))
+```
+
+
+```{r table demographic info 18yo female participants currently working}
+act_all_female %>% 
+    filter(dem1_01 == "18" | dem1_15a == "Yes") %>%
+    group_by(dem1_05a) %>% 
+    summarize(n = n(), 
+            Percent = round(n()/219*100)) %>% 
+    kable(col.names = c("Reported Race", "n", "Percent"), caption = "Racial Demographics Self-Reported by Participants")
+
+act_all_female %>% 
+    filter(dem1_01 == "18" | dem1_15a == "Yes") %>%
+    group_by(dem1_04) %>% 
+    summarize(n = n(), 
+            Percent = round(n()/219*100)) %>% 
+    kable(col.names = c("Ethnicity", "n", "Percent"), caption = "Ethnic Demographics Self-Reported by Participants")
+```
+
+
+## Measures and Variables of Interest  
+### *Beck Depression Inventory-II*
+The Beck Depression Inventory-II (BDI, @bdi) is an assessment of severity of depression. The BDI is composed of 21 questions about symptoms and views that are rated on a scale of 0 to 3. The total score is the sum of responses from the 21 items. It is a continuous variable. Higher total scores are associated with more severe depression.
+
+
+### *Annual Income*
+Among other demographic and socioeconomic variables, participants in the ACT Suicide Prevention Study (citation) were asked to provide information regarding their individual personal income. The item was “For yourself, please estimate the gross annual income (before taxes) for the last year. If unknown, choose unknown.” Participants could select their response from the following options: (a) less than $5,000, (b) $5,000 - $9,999, (c) $10,000 - $14,999, (d) $15,000 - $19,999, (e) $20,000 - $24,999, (f) $25,000 - $29,999, (g) $30,000 - $49,999, (h) $50,000 or more, (i) unknown, and (j) I choose note to answer. This variable is categorical with 10 levels. 
+
+## Analyses 
+To evaluate whether severity of depression, as measured with scores from the BDI, varied by level of income, we generated two exploratory data visualizations and calculated a table of descriptive statistics. We first generated a bar graph of the number of participants in each income level. Our second exploratory data visualization was a series of side-by-side boxplots of BDI scores by income level. We also calculated descriptive statistics (*n*, *M*, *SD*, minimum, maximum) for BDI scores by level of reported income. 
+ 
+To accomplish this project and our analyses, we used @r and the @here, @rio, @janitor, @tidyverse, and @knitr packages. 
+
+# Results
+```{r bar graph income of 18yo female participants currently working}
+act_all_female %>% 
+  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% 
+  mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
+                                              "$5,000 - $9,999",
+                                              "$10,000 - $14,999",
+                                              "$15,000 - $19,999",
+                                              "$20,000 - $24,999",
+                                              "$25,000 - $29,999",
+                                              "$50,000 or more",
+                                              "I choose not to answer",
+                                              "Unknown"
+                                              ))) %>% 
+  ggplot(aes(dem1_14)) +
+  geom_bar(fill = "magenta") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Figure 1", subtitle = "Participants' Annual Income", y = "Number of Participants", x = "Annual Income")
+```
+
+```{r boxplots of BDI scores by income for 18yo female participants currently working}
+act_all_female %>% 
+  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% 
+  mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
+                                              "$5,000 - $9,999",
+                                              "$10,000 - $14,999",
+                                              "$15,000 - $19,999",
+                                              "$20,000 - $24,999",
+                                              "$25,000 - $29,999",
+                                              "$50,000 or more",
+                                              "I choose not to answer",
+                                              "Unknown"
+                                              ))) %>% 
+  ggplot(aes(bdi1, dem1_14)) +
+  geom_boxplot(color = "magenta") + 
+  coord_flip() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Figure 2", subtitle = "Beck Depression Inventory (BDI) Scores by Annual Income", x = "BDI Scores", y = "Annual Income")
+
+```
+
+```{r descrip BDI by income 18yo female participants currently working}
+act_all_female %>% 
+  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% 
+  mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
+                                              "$5,000 - $9,999",
+                                              "$10,000 - $14,999",
+                                              "$15,000 - $19,999",
+                                              "$20,000 - $24,999",
+                                              "$25,000 - $29,999",
+                                              "$50,000 or more",
+                                              "I choose not to answer",
+                                              "Unknown"
+                                              ))) %>% 
+  group_by(dem1_14) %>% 
+  summarize(n = n(), 
+            M = round(mean(bdi1, na.rm = TRUE), 2),
+            SD = round(sd(bdi1, na.rm = TRUE), 2),
+            Min = min(bdi1, na.rm = TRUE), 
+            Max = max(bdi1, na.rm = TRUE)) %>% 
+  kable(col.names = c("Annual Income", "n", "M", "SD", "Min", "Max"), caption = "Descriptive Statistics of Participants' Beck Depression Inventory (BDI) Scores by Income Level")
+```
+
+# Discussion
+
+
+\newpage
+
+# References
