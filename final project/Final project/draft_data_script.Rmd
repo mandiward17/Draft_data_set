@@ -64,7 +64,7 @@ dim(act_all)
 length(unique(act_all$id))
 ```
 
-### Used select to pull out all columns with demographic infomation as well as BDI scores as these were the only variables we were intersted in looking at. From here we were able to pick which specific variables we wanted to look at relationships between.
+### Here we used select to pull out all columns with demographic infomation as well as BDI scores as these were the only variables we were intersted in looking at. From here we were able to pick which specific variables we wanted to look at relationships between.
 
 ```{r select}
 act_all %>% 
@@ -72,7 +72,7 @@ act_all %>%
     )
 ```
 
-#### Calculate *M*, *SD*, *n*, min, and max of Beck Depression Inventory (BDI) scores by all reported genders.
+#### We calculated *M*, *SD*, *n*, min, and max of Beck Depression Inventory (BDI) scores by all reported genders.
 ```{r}
 act_all %>% 
   group_by(dem1_07a) %>% 
