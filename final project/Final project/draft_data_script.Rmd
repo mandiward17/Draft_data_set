@@ -13,7 +13,6 @@ library(rio)
 library(janitor)
 library(gtsummary)
 
-theme_set(theme_minimal())
 ```
 
 ### Description of the dataset and research questions
@@ -33,11 +32,6 @@ Variables of interest:
 
 #### Load in data
 
-```{r}
-act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_df") %>% 
-  characterize() %>% 
-  clean_names()
-```
 
 ```{r}
 act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_df") %>% 
@@ -47,6 +41,8 @@ act_t1 <- import(here("data", "ACT Suicide Prevention T1.sav"), setclass = "tbl_
 act_t1_12520 <- import(here("data", "ACT Suicide Prevention T1 1-25-20.sav"), setclass = "tbl_df") %>% 
   characterize() %>% 
   clean_names()
+
+#I removed the duplicate chunk that was before the setup chunk
 ```
 
 #### Conduct a full join to explore the differences in the two files shared with us. Both datasets had the same number of rows (one row per participant as confirmed using the `length()` and `unique()` functions), but one dataset had 137 columns and the other had 161 columns. We suspected the file with more columns contained additional variables. The joined file had no change in number of rows and 161 columns.
@@ -81,6 +77,8 @@ act_all %>%
             n_bdi = n(), 
             min_bdi = min(bdi1, na.rm = TRUE), 
             max_bdi = max(bdi1, na.rm = TRUE))
+
+#It might be helpful to save these values using mutate() so that you have them appended to the dataset for future reference.
 ```
 
 #### Calculate *M*, *SD*, and *n* of Beck Depression Inventory (BDI) scores by all reported genders and income level. This resulted in a table with columns for gender, income category, and descriptive stats for each group (rows corresponded to stats for a gender group and income group). We used `pivot_wider()` to widen the table by the gender variable. This resulted in  *M*, *SD*, and *n* columns for each gender. However, the resulting columns were not grouped by gender but by descriptive stat (e.g., mean_bdi_Man,mean_bdi_Transgender, mean_bdi_Woman). We wanted the descriptives (*M*, *SD*, and *n*) grouped by gender (e.g., *M*, *SD*, *n* for men, etc.). To accomplish this, we used `pivot_wider_spec()` to summarize BDI descriptive stats for each income category by reported gender. In other words, the resulting table has sets of columns of descriptives for each reported gender and one row per income category. We then used `pivot_longer()` to transform the table to a long form.
@@ -161,6 +159,8 @@ act_all_descrip_gender_income_long <- act_all_descrip_gender_income_wide_spec  %
 
 act_all_descrip_gender_income_long
 
+#By creating all these different datasets, it will be hard to remember which dataset has the variables you are looking for. It may be helpful to just create one master dataset that you can work from.
+
 ```
 
 #### We are interested in examining the relationship between income and depression (as measured with the BDI) for participants who identify as female. Filter dataset to only include female participants accordingly.
@@ -168,6 +168,8 @@ act_all_descrip_gender_income_long
 ```{r}
 act_all_female <- act_all %>% 
   filter(dem1_07a == "Woman")
+
+#Are you interested in comparing gender groups or just looking at people who identify as female?
 ```
 
 #### Explore the distribution of participants' ages. The majority of female participants are 18 years old. 
@@ -189,6 +191,7 @@ act_all_female %>%
   geom_bar(fill = "magenta") + 
   facet_wrap(~dem1_01) +
   labs(title = "Rates of Depression among Female Participants by Age", subtitle = "Using results from the Beck Depression Inventory", y = "Number of Participants", x = "Rate of Depression")
+
 ```
 
 #### Descriptive statistics of female participants' BDI scores by age
@@ -201,6 +204,8 @@ act_all_female %>%
             n_bdi = n(), 
             min_bdi = min(bdi1, na.rm = TRUE), 
             max_bdi = max(bdi1, na.rm = TRUE))
+
+#Again, you can use mutate() to append these to the dataset
 ```
 
 #### Side-by-side boxplots of BDI scores by age for all female participants 
@@ -285,5 +290,25 @@ act_all_female %>%
 ```{r}
 act_all_female %>%
   gtsummary::tbl_summary()
+
+#This table is very long and not very informative, perhaps you can collapse some of the rows so that there are not 1 datapoint per row.
 ```
 
+#Great Job!
+
+##Strengths
+
+- Well done manupulating your data, I think you did a great job merging the data you had to create one cohesive dataset.
+- The figures look very nice and well-labeled
+-Good job using the pivot functions for your data to examine
+ 
+##What I Learned
+
+- There is a **strong** relationship between depression in female college students and income, in particular 18 year olds!
+- 18 Year olds are more likely to complete a survey about income than other age groups.
+
+##Areas to Improve
+
+- Like I mentioned in my comments, it would be helpful to work from just one dataset rather than having multiple to work from
+- The figures could be more informative. I think that they look quite nice but more information would drive home what your findings are.
+- The table would benefit from collapsing the categories.
