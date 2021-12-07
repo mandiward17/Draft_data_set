@@ -29,6 +29,8 @@ Variables of interest:
   + Financial support (dem1.16a - dem1.16g)
 - Beck Depression Inventory (bdi1)
 
+## MG: You may want to elaborate on your reasoning for picking this population and methodology (i.e., chosen variables). Why is this group particularly important?
+
 ### Draft Data Script  
 
 #### Load in data
@@ -163,6 +165,8 @@ act_all_descrip_gender_income_long
 
 ```
 
+## My group and I are having a tough time with utilizing pivot_wider and pivot_longer - you all did a great job!
+
 #### We are interested in examining the relationship between income and depression (as measured with the BDI) for participants who identify as female. Filter dataset to only include female participants accordingly.
 
 ```{r}
@@ -279,6 +283,7 @@ act_all_female %>%
             Max = max(bdi1, na.rm = TRUE)) %>% 
   knitr::kable(col.names = c("Annual Income", "n", "M", "SD", "Min", "Max"), caption = "Descriptive Statistics of BDI Scores for 18-Year-Old Female Participants Currently Working")
 ```
+## MG: Your tables looks great and display the data nicely!
 
 #### Trying out one of the table functions covered in Week 6 (gtsummary). The resulting table shows the counts and percentages of responses for each variable for female participants (e.g., number and percentage of female participants who reported their age as 17).
 
