@@ -3,7 +3,7 @@ title: "Annual Income and Depression Among Women in Their First Year of College:
 subtitle: EDLD 651 Final Project Paper
 author: Marielena McWhirter, Mandi Ward, Amy Warnock 
 output: pdf_document
-bibliography: references.bib 
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -172,10 +172,10 @@ ggplot(act_all_female, aes(bdi1, dem1_01)) +
 
 ## Participants 
 
-Participants in this study were `r act_all_female %>%  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% summarize(n = n())` 18-year-old first-time college freshmen attending the University of Nevada, Reno (UNR). The participants’ data were collected as part of a larger randomized study, the ACT Suicide Prevention Study, that evaluated the effectiveness of an intervention aimed at preventing suicidality among college students (citation). Between 2008 and 2010, all incoming freshmen at UNR between the ages of 18–20 were invited to participate in the ACT Suicide Prevention Study via mass email. Those who expressed interest in participating were screened with the Acceptance and Action Questionnaire-II (@aaq). Students with AAQ-II scores in the upper 50th percentile were selected for inclusion in the study. The dataset we worked from contained pre-intervention baseline data, including participants’ demographic information (e.g., age, race/ethnicity, gender, living situation, working situation, family income, personal income, financial aid) and responses from a wide variety of assessment instruments measuring suicidality, mental health, experiential avoidance, and other theoretically relevant behaviors and views (e.g., values, emotional regulation). There were a total of 972 participants in the pre-intervention baseline dataset from which we sampled, including those who reported their gender as female, male, and transgender.   
-
-For the purpose of the present research study, a subsample was created that included participants who were 18 years old, reported their gender as female, and were currently working. Self-reported race and ethnicity demographics for the resulting `r act_all_female %>%  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% summarize(n = n())` participants is summarized in Tables 1 and 2. Of participants in the present study, 2% reported themselves as American Indian or Alaska Native, 5% as Asian, 2% as Black or African American, 9% as multiracial, 1% as Native Hawaiian or Pacific Islander, and 74% as White or Caucasian. Approximately 7% of participants chose not to respond. Fourteen percent of respondents were Hispanic or Latino, 85% were not Hispanic or Latino, and 1% opted not to respond. 
-
+Participants in this study were `r act_all_female %>% filter(dem1_01 == "18 yrs" & dem1_15a == "Yes") %>% summarize(n = n())` 18-year-old first-time college freshmen attending the University of Nevada, Reno (UNR). The participants’ data were collected as part of a larger randomized study, the ACT Suicide Prevention Study, that evaluated the effectiveness of an intervention aimed at preventing suicidality among college students (Levin et al., 2014). Between 2008 and 2010, all incoming freshmen at UNR between the ages of 18–20 were invited to participate in the ACT Suicide Prevention Study via mass email. Those who expressed interest in participating were screened with the Acceptance and Action Questionnaire-II (@aaq). Students with AAQ-II scores in the upper 50th percentile were selected for inclusion in the study. The dataset we worked from contained pre-intervention baseline data, including participants’ demographic information (e.g., age, race/ethnicity, gender, living situation, working situation, family income, personal income, financial aid) and responses from a wide variety of assessment instruments measuring suicidality, mental health, experiential avoidance, and other theoretically relevant behaviors and views (e.g., values, emotional regulation). There were a total of 972 participants in the pre-intervention baseline dataset from which we sampled, including those who reported their gender as female, male, and transgender.     
+ 
+For the purpose of the present research study, we created a subsample that included participants who were 18 years old, reported their gender as female, and were currently working. Self-reported race and ethnicity demographics for the resulting `r act_all_female %>% filter(dem1_01 == "18 yrs" & dem1_15a == "Yes") %>% summarize(n = n())` participants is summarized in Tables 1 and 2.  Of participants in the present study, 2% reported themselves as American Indian or Alaska Native, 4% as Asian, 2% as Black or African American, 9% as multiracial, 1% as Native Hawaiian or Pacific Islander, and 74% as White or Caucasian. Approximately 8% of participants chose not to respond. Fifteen percent of respondents were Hispanic or Latino, 83% were not Hispanic or Latino, and 2% opted not to respond.  
+ 
 ```{r convert race ethnicity to factor and assign levels, results = FALSE}
 
 act_all_female <- act_all_female %>% 
@@ -195,38 +195,41 @@ act_all_female <- act_all_female %>%
 
 ```{r table demographic info 18yo female participants currently working}
 act_all_female %>% 
-    filter(dem1_01 == "18" | dem1_15a == "Yes") %>%
+    filter(dem1_01 == "18 yrs" & dem1_15a == "Yes") %>%
     group_by(dem1_05a) %>% 
     summarize(n = n(), 
-            Percent = round(n()/219*100)) %>% 
+            Percent = round(n()/178*100)) %>% 
     kable(col.names = c("Race", "n", "Percent"), caption = "Racial Demographics Self-Reported by Participants")
 
 act_all_female %>% 
-    filter(dem1_01 == "18" | dem1_15a == "Yes") %>%
+    filter(dem1_01 == "18 yrs" & dem1_15a == "Yes") %>%
     group_by(dem1_04) %>% 
     summarize(n = n(), 
-            Percent = round(n()/219*100)) %>% 
+            Percent = round(n()/178*100)) %>% 
     kable(col.names = c("Ethnicity", "n", "Percent"), caption = "Ethnic Demographics Self-Reported by Participants")
 ```
 
 
 ## Measures and Variables of Interest  
 ### *Beck Depression Inventory-II*
-The Beck Depression Inventory-II (BDI, @bdi) is an assessment of severity of depression. The BDI is composed of 21 questions about symptoms and views that are rated on a scale of 0 to 3. The total score is the sum of responses from the 21 items. It is a continuous variable. Higher total scores are associated with more severe depression.
-
+The Beck Depression Inventory-II (BDI, @bdi) is an assessment of severity of depression. The BDI is composed of 21 questions about symptoms and views related to depression that are rated on a scale of 0 to 3. The total score is the sum of responses from the 21 items. It is a continuous variable. Higher total scores are associated with more severe depression.  
 
 ### *Annual Income*
-Among other demographic and socioeconomic variables, participants in the ACT Suicide Prevention Study (citation) were asked to provide information regarding their individual personal income. The item was “For yourself, please estimate the gross annual income (before taxes) for the last year. If unknown, choose unknown.” Participants could select their response from the following options: (a) less than $5,000, (b) $5,000 - $9,999, (c) $10,000 - $14,999, (d) $15,000 - $19,999, (e) $20,000 - $24,999, (f) $25,000 - $29,999, (g) $30,000 - $49,999, (h) $50,000 or more, (i) unknown, and (j) I choose note to answer. This variable is categorical with 10 levels. 
+Among other demographic and socioeconomic variables, participants in the ACT Suicide Prevention Study (@levin) were asked to provide information regarding their individual personal income. The item asked, “For yourself, please estimate the gross annual income (before taxes) for the last year. If unknown, choose unknown.” Participants could select a response from the following options: (a) less than $5,000, (b) $5,000 - $9,999, (c) $10,000 - $14,999, (d) $15,000 - $19,999, (e) $20,000 - $24,999, (f) $25,000 - $29,999, (g) $30,000 - $49,999, (h) $50,000 or more, (i) unknown, and (j) I choose note to answer. This variable is categorical with 10 levels.   
 
-## Analyses 
-To evaluate whether severity of depression, as measured with scores from the BDI, varied by level of income, we generated two exploratory data visualizations and calculated a table of descriptive statistics. We first generated a bar graph of the number of participants in each income level. Our second exploratory data visualization was a series of side-by-side boxplots of BDI scores by income level. We also calculated descriptive statistics (*n*, *M*, *SD*, minimum, maximum) for BDI scores by level of reported income. 
+## Dataset Preparation and Analysis 
+Our dataset had been organized and tidied before we received access to it. The dataset was quite large, containing dozens of columns summarizing participants’ responses to various assessments and questionnaires. Once we determined which variables we wanted to explore, we created a smaller dataset that only included the variables we would examine. After organizing the data into a table containing the variables of interest, we began a preliminary analysis of the data using several data visualizations. We approached our dataset by first looking at how many female students participated in the study, by age group, and then at distributions of how female participants scored on the BDI, by age. We then filtered the dataset to only include female participants who were 18 years old and reported themselves as currently working.    
  
-To accomplish this project and our analyses, we used `R` (@r) and the `here()` (@here), `rio()` (@rio), `janitor()` (@janitor), `tidyverse()` (@tidyverse), and `knitr()` (@knitr) packages. 
+To evaluate whether the severity of depression varied by level of income, we generated two exploratory data visualizations and calculated a table of descriptive statistics. We first generated a bar graph of the number of participants in each income level. Our second exploratory data visualization was a series of side-by-side boxplots of BDI scores by income level. We also calculated descriptive statistics (*n*, *M*, *SD*, minimum, maximum) for BDI scores by level of reported income.   
+ 
+To accomplish this project and our analyses, we used `R` (@r) and the `here()` (@here), `rio()` (@rio), `janitor()` (@janitor), `tidyverse()` (@tidyverse), and `knitr()` (@knitr) packages.  
 
 # Results
+
+
 ```{r bar graph income of 18yo female participants currently working}
 act_all_female %>% 
-  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% 
+  filter(dem1_01 == "18 yrs" & dem1_15a == "Yes") %>% 
   mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
                                               "$5,000 - $9,999",
                                               "$10,000 - $14,999",
@@ -245,7 +248,7 @@ act_all_female %>%
 
 ```{r boxplots of BDI scores by income for 18yo female participants currently working}
 act_all_female %>% 
-  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% 
+  filter(dem1_01 == "18 yrs" & dem1_15a == "Yes") %>% 
   mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
                                               "$5,000 - $9,999",
                                               "$10,000 - $14,999",
@@ -266,7 +269,7 @@ act_all_female %>%
 
 ```{r descrip BDI by income 18yo female participants currently working}
 act_all_female %>% 
-  filter(dem1_01 == "18" | dem1_15a == "Yes") %>% 
+  filter(dem1_01 == "18 yrs" & dem1_15a == "Yes") %>% 
   mutate(dem1_14 = factor(dem1_14, levels = c("Less than $5,000",
                                               "$5,000 - $9,999",
                                               "$10,000 - $14,999",
